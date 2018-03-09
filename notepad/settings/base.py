@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'operating',
     'cycles',
     'import_export',
+    'storages',
 ]
 
 MIDDLEWARE = [
