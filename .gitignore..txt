@@ -12,8 +12,8 @@ __pycache__/
 *.so
 
 # Django related 
-src/awitha/settings/local.py
-src/awitha/settings/local.py
+awitha/notepad/settings/local.py
+awitha/notepad/settings/base.py
 
 # static-cdn/  # any collected static files 
 
