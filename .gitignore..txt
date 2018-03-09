@@ -1,3 +1,9 @@
+notepad/settings/local.py
+notepad/settings/base.py
+db.sqlite3
+
+
+
 .DS_Store
 bin/
 include/
@@ -12,8 +18,7 @@ __pycache__/
 *.so
 
 # Django related 
-awitha/notepad/settings/local.py
-awitha/notepad/settings/base.py
+
 
 # static-cdn/  # any collected static files 
 
