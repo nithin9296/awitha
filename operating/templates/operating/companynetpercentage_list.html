@@ -1,0 +1,6 @@
+<ul>
+{% for obj in object_list %}
+    <li><a href='{{ obj.get_absolute_url }}'>{{ obj }}</a><br/>
+    {{ obj.region  }} {{ obj.industry }} {{ obj.npy2015  }} {{ obj.npy2016 }} {{ obj.npy2017 }}</li>
+{% endfor %}
+</ul>

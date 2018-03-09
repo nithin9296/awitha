@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+<script>
+{% block jquery %}
+var endpoint = '/operating/api/chart/data/'
+var defaultData1 = []
+var defaultData2 = []
+
+var labels = [];
+$.ajax({
+    method: "GET",
+    url: endpoint,
+    success: function(data){
+        labels = data.labels
+        defaultData1 = data.default_c
+        defaultData2 = data.default_i
+        setChart()
+    },       
+       
+    error: function(error_data){
+        console.log("error")
+        console.log(error_data)
+    }
+})
+ 
+
+
+function setChart(){
+    var ctx = document.getElementById("myChart");
+    var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Net Profit - Company',
+            data: defaultData1,
+            borderColor: "#3e95cd",
+            fill : false
+        }, { 
+            label: 'Net Profit - Industry',
+            data: defaultData2,
+            borderColor: "#8e5ea2",
+            fill : false  
+        }
+        ]
+    },
+
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true,
+                    tension: 0,
+                }
+            }]
+        }
+    }
+});
+
+}
+
+
+{% endblock %}
+</script>
+
+{% block content %}
+
+<div class='row'>
+    <div class='col-sm-12' url-endpoint='{% url "api-data" %}'>
+        <h1>Comparision of Company Data vs Industry</h1>
+        <div class='col-sm-10'>
+        <canvas id="myChart" width="1200" height="700"></canvas>
+        </div>
+        <div class='col-sm-6'>
+            <canvas id="myChart2" width="400" height="400"></canvas>
+        </div>    
+        
+      
+    </div>
+        
+</div>
+
+{% endblock content %}
+
+
+<!--  <body>
+  {% include 'list.html' %}
+
+</body>
+ -->
