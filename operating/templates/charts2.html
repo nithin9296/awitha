@@ -2,7 +2,7 @@
 
 <script>
 {% block jquery %}
-var endpoint = '/operating/api/chart/data/'
+var endpoint = '/operating/api/chart/data2/'
 var defaultData1 = []
 var defaultData2 = []
 var defaultData3 = []
@@ -31,51 +31,18 @@ $.ajax({
 
 function setChart(){
     var ctx = document.getElementById("myChart");
-    var myChart = new Chart(ctx, {
+    var ctx2 = document.getElementById("myChart2");
+    var myChart = new Chart(ctx2, {
     type: 'line',
     data: {
         labels: labels,
         datasets: [{
-            label: 'Net Profit - Company',
-            data: defaultData1,
-            borderColor: "#3e95cd",
-            fill : false
-        }, { 
-            label: 'Net Profit - Industry',
-            data: defaultData2,
-            borderColor: "#8e5ea2",
-            fill : false  
-        }
-        ]
-    },
-
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true,
-                    tension: 0,
-                }
-            }]
-        }
-    }
-});
-
-}
-
-function setChart(){
-    var ctx = document.getElementById("myChart1");
-    var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: labels,
-        datasets: [{
-            label: 'Gross Profit Comparision',
+            label: 'Gross Margin percentage - Company',
             data: defaultData3,
             borderColor: "#3e95cd",
             fill : false
         }, { 
-            label: 'Net Profit - Industry',
+            label: 'Gross Margin percentage - Industry',
             data: defaultData2,
             borderColor: "#8e5ea2",
             fill : false  
@@ -95,24 +62,48 @@ function setChart(){
     }
 });
 
-}
-
-function setChart(){
-    var ctx = document.getElementById("myChart2");
     var myChart = new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
         labels: labels,
         datasets: [{
-            label: 'Debt Equity Comparision',
+            label: 'Debt Equity percentage Company',
             data: defaultData4,
-            borderColor: "#3e95cd",
-            fill : false
-        }, { 
-            label: 'Net Profit - Industry',
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 235, 1)'
+            ],
+            borderWidth: 1
+
+    
+        },{ 
+            label: 'Debt Equity Percentage - Industry',
             data: defaultData2,
-            borderColor: "#8e5ea2",
-            fill : false  
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 206, 86, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(255, 206, 86, 1)'
+            ],
+            borderWidth: 1
         }
         ]
     },
@@ -130,13 +121,15 @@ function setChart(){
 });
 
 }
+
+
 {% endblock %}
 </script>
 
 {% block content %}
 
 <div class='row'>
-    <div class='col-sm-12' url-endpoint='{% url "api-data" %}'>
+    <div class='col-sm-12' url-endpoint='{% url "api-data2" %}'>
         <h1>Comparision of Company Data vs Industry</h1>
         <div class='col-sm-6'>
         <canvas id="myChart" width="400" height="400"></canvas>

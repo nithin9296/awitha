@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelChoiceField, ModelForm
-from .models import Region, Industry, CompanyNetPercentage
+from .models import Region, Industry, CompanyNetPercentage, trialbalance
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -26,7 +26,7 @@ from django.contrib.auth.models import User
 class CompanyNetPercentageForm(ModelForm):
 	class Meta:
 		model = CompanyNetPercentage
-		fields = ['user', 'region', 'industry', 'npy2015', 'npy2016', 'npy2017']
+		fields = ['user', 'region', 'industry', 'gross_profit_margin_2015', 'gross_profit_margin_2016', 'gross_profit_margin_2017', 'debtequity_ratio_2015','debtequity_ratio_2016', 'debtequity_ratio_2017',  'netmargin_percentage_2015', 'netmargin_percentage_2016', 'netmargin_percentage_2017']
 		# def __int__(self, request, *args, **kwargs):
 		# 	super(CompanyNetPercentageForm, self).__init__(*args, **kwargs)
 		# 	self.fields[]
@@ -64,6 +64,19 @@ class SignUpForm(UserCreationForm):
 
 
 
+class trialbalanceForm(forms.ModelForm):
+	trialbalancefile = forms.FileField(
+        label = 'Upload trialblanace as per the format' 
+        )
+	# user = forms.CharField(max_length=25)
+	# region   = forms.CharField(max_length=25, choices=REGION_CHOICES)
+	class Meta:
+		model = trialbalance
+		fields = ('user', 'region', 'industry',)
 
+# class trialbalanceForm(forms.Form):
+#  	trialbalancefile = forms.FileField(
+#         label = 'Upload trialblanace as per the format' 
+#         )
 
-
+#  

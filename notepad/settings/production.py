@@ -30,6 +30,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['awitha.herokuapp.com', '.analyticsforaudit.com']
 
+FILE_UPLOAD_HANDLERS = ("django_excel.ExcelMemoryFileUploadHandler",
+                        "django_excel.TemporaryExcelFileUploadHandler")
+
 
 # Application definition
 

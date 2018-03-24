@@ -36,9 +36,15 @@ class UserName(models.Model):
 class npmargin(models.Model):
 	region   = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
 	industry = models.ForeignKey(Industry, on_delete=models.CASCADE, null=True)
-	npy2015  = models.DecimalField(max_digits=5, decimal_places=2)
-	npy2016  = models.DecimalField(max_digits=5, decimal_places=2)
-	npy2017  = models.DecimalField(max_digits=5, decimal_places=2)
+	netmargin_percentage_2015  = models.DecimalField(max_digits=5, decimal_places=2)
+	netmargin_percentage_2016  = models.DecimalField(max_digits=5, decimal_places=2)
+	netmargin_percentage_2017  = models.DecimalField(max_digits=5, decimal_places=2)
+	gross_profit_margin_2015  = models.DecimalField(max_digits=5, decimal_places=2)
+	gross_profit_margin_2016  = models.DecimalField(max_digits=5, decimal_places=2)
+	gross_profit_margin_2017  = models.DecimalField(max_digits=5, decimal_places=2)
+	debtequity_ratio_2015 = models.DecimalField(max_digits=5, decimal_places=2)	
+	debtequity_ratio_2016 = models.DecimalField(max_digits=5, decimal_places=2)	
+	debtequity_ratio_2017 = models.DecimalField(max_digits=5, decimal_places=2)	
 
 	def __str__(self):
 		return str(self.industry)
@@ -75,34 +81,34 @@ INDUSTRY_CHOICES=[
 	('Telecom. Services', 'Telecom. Services'),
 	('Telecom. Equipment', 'Telecom. Equipment'),
 	('Telecom (Wireless)', 'Telecom (Wireless)'),
-# Steel
-# Software (System & Application)
-# Software (Internet)
-# Software (Entertainment)
-# Shoe
-# Shipbuilding & Marine
-# Semiconductor Equip
-# Semiconductor
-# Rubber& Tires
-# Retail (Special Lines)
-# Retail (Online)
-# Retail (Grocery and Food)
-# Retail (General)
-# Retail (Distributors)
-# Retail (Building Supply)
-# Retail (Automotive)
-# Restaurant/Dining
-# Reinsurance
-# Recreation
-# Real Estate (Operations & Services)
-# Real Estate (General/Diversified)
-# Real Estate (Development)
-# R.E.I.T.
-# Publishing & Newspapers
-# Precious Metals
-# Power
-# Paper/Forest Products
-# Packaging & Container
+	('Steel', 'Steel'),
+	('Software (System & Application)', 'Software (System & Application)'),
+	('Software (Internet)', 'Software (Internet)'),
+	('Software (Entertainment)', 'Software (Entertainment)'),
+	('Shoe', 'Shoe'),
+	('Shipbuilding & Marine', 'Shipbuilding & Marine'),
+	('Semiconductor Equip', 'Semiconductor Equip'),
+    ('Semiconductor', 'Semiconductor'),
+	('Rubber& Tires', 'Rubber& Tires'),
+	('Retail (Special Lines)','Retail (Special Lines)'),
+	('Retail (Online)', 'Retail (Online)'), 
+	('Retail (Grocery and Food)', 'Retail (Grocery and Food)'),
+	('Retail (General)', 'Retail (General)'),
+	('Retail (Distributors)', 'Retail (Distributors)'),
+	('Retail (Building Supply)', 'Retail (Building Supply)'),
+	('Retail (Automotive)', 'Retail (Automotive)'),
+	('Restaurant/Dining', 'Restaurant/Dining'),
+	('Reinsurance', 'Reinsurance'),
+	('Recreation', 'Recreation'),
+	('Real Estate (Operations & Services)', 'Real Estate (Operations & Services)'),
+	('Real Estate (General/Diversified)', 'Real Estate (General/Diversified)'),
+	('Real Estate (Development)', 'Real Estate (Development)'),
+	('R.E.I.T.', 'R.E.I.T.'),
+	('Publishing & Newspapers', 'Publishing & Newspapers'),
+	('Precious Metals', 'Precious Metals'),
+	('Power','Power'), 
+	('Paper/Forest Products', 'Paper/Forest Products'),
+	('Packaging & Container', 'Packaging & Container'),
 # Oilfield Svcs/Equip.
 # Oil/Gas Distribution
 # Oil/Gas (Production and Exploration)
@@ -167,9 +173,15 @@ class CompanyNetPercentage(models.Model):
 	region   = models.CharField(max_length=25, choices=REGION_CHOICES)
 	industry  = models.CharField(max_length=25, choices=INDUSTRY_CHOICES)
 	#industry = forms.ModelChoiceield(queryset= Industry.objects.values_list('name'))
-	npy2015  = models.IntegerField(default=0)
-	npy2016  = models.IntegerField(default=0)
-	npy2017  = models.IntegerField(default=0)
+	gross_profit_margin_2015 = models.IntegerField(default=0)
+	gross_profit_margin_2016 = models.IntegerField(default=0)
+	gross_profit_margin_2017 = models.IntegerField(default=0)
+	debtequity_ratio_2015 = models.IntegerField(default=0)
+	debtequity_ratio_2016 = models.IntegerField(default=0)
+	debtequity_ratio_2017 = models.IntegerField(default=0)
+	netmargin_percentage_2015  = models.DecimalField(max_digits=5, decimal_places=2)
+	netmargin_percentage_2016  = models.DecimalField(max_digits=5, decimal_places=2)
+	netmargin_percentage_2017  = models.DecimalField(max_digits=5, decimal_places=2)
 
 	def __str__(self):
 		return str(self.user)
@@ -181,15 +193,51 @@ class CompanyNetPercentage(models.Model):
 				raise forms.ValidationError("User already exists")
 			return user
 
-class operatingmargin(models.Model):
-	region   = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
-	industry = models.ForeignKey(Industry, on_delete=models.CASCADE, null=True)
-	opy2015  = models.IntegerField(default=0)
-	opy2016  = models.IntegerField(default=0)
-	opy2017  = models.IntegerField(default=0)
+# class operatingmargin(models.Model):
+# 	region   = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+# 	industry = models.ForeignKey(Industry, on_delete=models.CASCADE, null=True)
+# 	opy2015  = models.IntegerField(default=0)
+# 	opy2016  = models.IntegerField(default=0)
+# 	opy2017  = models.IntegerField(default=0)
+
+# 	def __str__(self):
+# 		return str(self.industry)
+
+
+
+class trialbalance(models.Model):
+	user = models.CharField(max_length=25, default=0)
+	region   = models.CharField(max_length=25, choices=REGION_CHOICES, default=0)
+	industry  = models.CharField(max_length=25, choices=INDUSTRY_CHOICES, default=0)
+	glcode = models.IntegerField(default=0)
+	gldescription = models.CharField(max_length=30)
+	classification = models.CharField(max_length=30)
+	subclassification = models.CharField(max_length=30)
+	debit_2017 = models.IntegerField(default=0)
+	credit_2017 = models.IntegerField(default=0)
+	debit_2016 = models.IntegerField(default=0)
+	credit_2016 = models.IntegerField(default=0)
+	debit_2015 = models.IntegerField(default=0)
+	credit_2015 = models.IntegerField(default=0)
 
 	def __str__(self):
-		return str(self.industry)
+		return str(self.gldescription)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^admin/', admin.site.urls),
     url(r'^operating/', include("operating.urls")),
+    url(r'^cycles/', include("cycles.urls")),
 ]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 
 # if settings.DEBUG:
