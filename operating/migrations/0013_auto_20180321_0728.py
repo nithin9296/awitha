@@ -7,9 +7,9 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('operating', '0012_trialbalance_gldescription'),
-    ]
+    # dependencies = [
+    #     ('operating', '0012_trialbalance_gldescription'),
+    # ]
 
     operations = [
         migrations.AddField(
