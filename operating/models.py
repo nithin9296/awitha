@@ -210,7 +210,7 @@ class trialbalance(models.Model):
 	region   = models.CharField(max_length=25, choices=REGION_CHOICES, default=0)
 	industry  = models.CharField(max_length=25, choices=INDUSTRY_CHOICES, default=0)
 	glcode = models.IntegerField(default=0)
-	gldescription = models.CharField(max_length=30)
+	gldescription = models.CharField(max_length=60)
 	classification = models.CharField(max_length=30)
 	subclassification = models.CharField(max_length=30)
 	debit_2017 = models.IntegerField(default=0)
