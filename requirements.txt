@@ -24,3 +24,4 @@ django-storages
 django_excel
 sorl-thumbnail
 pandas
+xlsxwriter
