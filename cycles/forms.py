@@ -6,10 +6,10 @@ from .models import profitandloss, balancesheet
 class profitandlossform(ModelForm):
 	class Meta:
 		model = profitandloss
-		fields = ['documentid', 'glcode', 'gldescription', 'amount']
+		fields = ('documentid', 'glcode', 'gldescription', 'amount')
 
 
 class balancesheetform(ModelForm):
 	class Meta:
 		model = balancesheet
-		fields = ['documentid', 'glcode', 'gldescription', 'amount']
+		fields = ['documentid', 'glcode', 'gldescriptions', 'amount']

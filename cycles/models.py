@@ -16,7 +16,7 @@ class profitandloss(models.Model):
 class balancesheet(models.Model):
 	documentid = models.IntegerField(default=0)
 	glcode = models.IntegerField(default=0)
-	gldescription = models.CharField(max_length=30)
+	gldescriptions = models.CharField(max_length=30)
 	amount = models.IntegerField(default=0)
 
 	def __str__(self):

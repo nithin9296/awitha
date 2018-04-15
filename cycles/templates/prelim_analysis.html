@@ -14,11 +14,20 @@
     <form action="" enctype="multipart/form-data"  method="post">
         <table>
             {{ form.as_table }}
+            {{ sub_form.as_table }}
         </table>
         {% csrf_token %}
         <input type="submit" value="Submit">
     </form>
 
-  
+<!--  <form action="" enctype="multipart/form-data"  method="post">
+        <table>
+            {{ sub_form.as_table }}
+        </table>
+        {% csrf_token %}
+        <input type="submit" value="Submit">
+    </form>
+   -->
 </body>
+
 </html>

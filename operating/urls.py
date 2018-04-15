@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 
 
-from .views import  npmargin_detail_view, login_page, ChartData, ChartData_op2, npmargin_view, signup, trialbalanceanalysis,  rationop1, options
+from .views import  npmargin_detail_view, login_page, ChartData, ChartData_op2, npmargin_view, signup, trialbalanceanalysis,  rationop1, options, productview, qs_to_local_csv, CSVDownloadView, DataView, about, feedback
 
 urlpatterns = [
     #url(r'^$', npmarginListView.as_view(), name='npmargin_changelist'),
@@ -21,5 +21,10 @@ urlpatterns = [
     #url(r'^handson_view/', handson_table, name="handson_view"),
     url(r'^rationop1/$', rationop1),
     url(r'^options/$', options),
+    url(r'^about/$', about),
+    url(r'^feedback/$', feedback),
+    url(r'^productview/$', productview),
+    url(r'^qs_to_local_csv/$', qs_to_local_csv),
+    url(r'^DataView/$', DataView.as_view()),
    ]
 

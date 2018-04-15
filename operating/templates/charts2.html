@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 
 <script>
 {% block jquery %}
+
+
 var endpoint = '/operating/api/chart/data2/'
 var defaultData1 = []
 var defaultData2 = []
@@ -27,11 +30,27 @@ $.ajax({
     }
 })
  
+// hot = new Handsontable(myChart, {
+//     data: defaultData3,
+//     rowHeaders: labels,
+//     colHeaders: labels,
+//     colWidths: 88,
+//     maxCols: 10,
+//     fillHandle: {
+//         autoInsertRow: false,
+//     }
+// });
 
+// hot.updateSettings({
+//     afterChange: function(changes, src) {
+//        myChart.update() 
+//     }
+// })
 
 function setChart(){
-    var ctx = document.getElementById("myChart");
+    var ctx = document.getElementById("myChart"); 
     var ctx2 = document.getElementById("myChart2");
+
     var myChart = new Chart(ctx2, {
     type: 'line',
     data: {
@@ -131,6 +150,7 @@ function setChart(){
 <div class='row'>
     <div class='col-sm-12' url-endpoint='{% url "api-data2" %}'>
         <h1>Comparision of Company Data vs Industry</h1>
+         <a class="btn btn-lg btn-block btn-primary" href="/operating/productview/" role="button">Download Table</a>
         <div class='col-sm-6'>
         <canvas id="myChart" width="400" height="400"></canvas>
         </div>
@@ -146,8 +166,31 @@ function setChart(){
 {% endblock content %}
 
 
-<!--  <body>
-  {% include 'list.html' %}
+{% block table %}
+<!-- <script src="{%static "js/bootstrap.min.js"%}"></script>
+<script src="{%static "js/jquery-slim.min.js"%}"></script>
+ --><script src="{%static "js/bootstrap-table.js"%}"></script>
+<table id='datatable'></table>
+<Script>
+$(document).ready(function(){
+  $('#datatable').bootstrapTable({
+    striped: true,
+    pagination: true,
+    showColumns: true,
+    showToggle: true,
+    showExport: true,
+    sortable: true,
+    paginationVAlign: 'both',
+    pageSize: 25,
+    pageList: [10, 25, 50, 100, 'ALL'],
+    // columns:{{columns|safe}},  // here is where we use the column content from our Django View
+    data:{{data|safe}}, // here is where we use the data content from our Django View. we escape the content with the safe tag so the raw JSON isn't shown.
+    });
+});
+</Script>
+{% endblock table %}
 
-</body>
- -->
+{% block feedback %}
+
+<a class="nav-link" href="/operating/feedback">Feedback</a>
+{% endblock feedback %}

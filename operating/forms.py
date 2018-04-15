@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelChoiceField, ModelForm
-from .models import Region, Industry, CompanyNetPercentage, trialbalance
+from .models import Region, Industry, CompanyNetPercentage, trialbalance, feedback
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -80,3 +80,12 @@ class trialbalanceForm(forms.ModelForm):
 #         )
 
 #  
+
+class feedbackform(forms.ModelForm):
+	feedback = forms.CharField(max_length=10000,
+			widget=forms.TextInput(attrs={'autofocus': 'autofocus',
+											'size': '100'}))
+
+	class Meta:
+		model = feedback
+		fields = ('feedback',)

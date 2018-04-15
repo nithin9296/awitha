@@ -1,5 +1,15 @@
 from django.db import models
 from django.contrib.auth import authenticate, login, get_user_model
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from io import StringIO
+from django.core.files import File
+from django.db import models
+from django.utils import timezone
+from operating.utils import convert_to_dataframe
+from .signals import object_viewed_signal
+from .utils import get_client_ip
 
 # Create your models here.
 # class npmarginManager(models.Manager):
@@ -109,29 +119,29 @@ INDUSTRY_CHOICES=[
 	('Power','Power'), 
 	('Paper/Forest Products', 'Paper/Forest Products'),
 	('Packaging & Container', 'Packaging & Container'),
-# Oilfield Svcs/Equip.
-# Oil/Gas Distribution
-# Oil/Gas (Production and Exploration)
-# Oil/Gas (Integrated)
-# Office Equipment & Services
-# Metals & Mining
-# Machinery
-# Investments & Asset Management
-# Insurance (Prop/Cas.)
-# Insurance (Life)
-# Insurance (General)
-# Information Services
-# Household Products
-# Hotel/Gaming
-# Hospitals/Healthcare Facilities
-# Homebuilding
-# Heathcare Information and Technology
-# Healthcare Support Services
-# Healthcare Products
-# Green & Renewable Energy
-# Furn/Home Furnishings
-# Food Wholesalers
-# Food Processing
+	('Oilfield Svcs/Equip.', 'Oilfield Svcs/Equip.'),
+	('Oil/Gas Distribution', 'Oil/Gas Distribution'),
+	('Oil/Gas (Production and Exploration)', 'Oil/Gas (Production and Exploration)'),
+	('Oil/Gas (Integrated)', 'Oil/Gas (Integrated)'),
+	('Office Equipment & Services', 'Office Equipment & Services'),
+	('Metals & Mining', 'Metals & Mining'),
+	('Machinery', 'Machinery'),
+	('Investments & Asset Management', 'Investments & Asset Management'),
+	('Insurance (Prop/Cas.)', 'Insurance (Prop/Cas.)'),
+	('Insurance (Life)', 'Insurance (Life)'),
+	('Insurance (General)', 'Insurance (General)'),
+	('Information Services', 'Information Services'),
+	('Household Products', 'Household Products'),
+	('Hotel/Gaming', 'Hotel/Gaming'),
+	('Hospitals/Healthcare Facilities', 'Hospitals/Healthcare Facilities'),
+	('Homebuilding', 'Homebuilding'),
+	('Heathcare Information and Technology', 'Heathcare Information and Technology'),
+	('Healthcare Support Services', 'Healthcare Support Services'), 
+	('Healthcare Products', 'Healthcare Products'),
+	('Green & Renewable Energy', 'Green & Renewable Energy'),
+	('Furn/Home Furnishings', 'Furn/Home Furnishings'),
+	('Food Wholesalers', 'Food Wholesalers'),
+	('Food Processing', 'Food Processing'),
 # Financial Svcs. (Non-bank & Insurance)
 # Farming/Agriculture
 # Environmental & Waste Services
@@ -226,14 +236,71 @@ class trialbalance(models.Model):
 
 
 
+class ObjectViewed(models.Model):
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+	content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True)
+	object_id = models.PositiveIntegerField()
+	ip_address = models.CharField(max_length=120, blank=True, null=True)
+	content_object = GenericForeignKey('content_type', 'object_id')
+	timestamp = models.DateTimeField(auto_now_add=True)
+
+	def __str__(self, ):
+		return "%s viewed: %s" %(self.content_object, self.timestamp)
+
+	class Meta:
+		ordering = ['-timestamp']
+		verbose_name = 'Object Viewed'
+		verbose_name_plural = 'Objects Viewed'
+
+def object_viewed_recevier(sender, instance, request, *args, **kwargs):
+	c_type = ContentType.get_for_model(sender)
+	ip_adress = None
+	try:
+		ip_adress = get_client_ip(request)
+	except:
+		pass
+	new_view_instance = ObjectViewed.objects.create(
+				user=request.user,
+				content_type=c_type,
+				object_id=instance.id,
+				ip_address=ip_address
+				)
+object_viewed_signal.connect(object_viewed_recevier)
+
+
+class DataSetManager(models.Manager):
+	def create_new(self, qs, fields=None):
+		df  = convert_to_dataframe(qs, fields=fields)
+		fp = StringIO()
+		fp.write(df.to_csv())
+		date = timezone.now().strftime("%m-%d-%y")
+		model_name = slugify(qs.model.__name__)
+		filename = "{}-{}.csv".format(model_name, date)
+		obj = self.model(
+			name = filename.replace('.csv', ''),
+                app = slugify(qs.model._meta.app_label),
+                model = qs.model.__name__,
+                lables = fields,
+                object_count = qs.count()
+            )
+		obj.save()
+		obj.csvfile.save(filename, File(fp)) #saves file to the file field
+		return obj
+
+class DatasetModel(models.Model):
+    name                = models.CharField(max_length=120)
+    app                 = models.CharField(max_length=120, null=True, blank=True)
+    model               = models.CharField(max_length=120, null=True, blank=True)
+    lables              = models.TextField(null=True, blank=True)
+    object_count        = models.IntegerField(default=0)
+    csvfile             = models.FileField(upload_to='datasets/', null=True, blank=True)
+    timestamp           = models.DateTimeField(auto_now_add=True)
 
 
 
 
-
-
-
-
+class feedback(models.Model):
+	feedback = models.CharField(max_length=10000)
 
 
 

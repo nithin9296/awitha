@@ -5,12 +5,14 @@ from import_export.admin import ImportExportModelAdmin, ImportExportMixin, Impor
 
 
 # Register your models here.
-from .models import npmargin, Industry, Region, UserName, CompanyNetPercentage
+from .models import npmargin, Industry, Region, UserName, CompanyNetPercentage, ObjectViewed, feedback
 
 
 admin.site.register(Region)
 admin.site.register(UserName)
 admin.site.register(CompanyNetPercentage)
+admin.site.register(ObjectViewed)
+admin.site.register(feedback)
 
 
 class Industryresource(resources.ModelResource):

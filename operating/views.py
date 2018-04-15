@@ -1,9 +1,9 @@
 from django.shortcuts import render, render_to_response, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
 from django.urls import reverse_lazy
-from .forms import CompanyNetPercentageForm, LoginForm, SignUpForm, trialbalanceForm
+from .forms import CompanyNetPercentageForm, LoginForm, SignUpForm, trialbalanceForm, feedbackform
 from django.contrib.auth import authenticate, login
-from .models import npmargin, CompanyNetPercentage, trialbalance
+from .models import npmargin, CompanyNetPercentage, trialbalance, ObjectViewed
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.views import APIView
@@ -16,6 +16,29 @@ import pyexcel
 from pyexcel  import get_sheet
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+import os
+import csv
+from django.conf import settings
+from django.utils.text import slugify
+from operating.utils import get_lookup_fields, qs_to_dataset
+from io import StringIO
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.files import File
+from django.http import HttpResponse, StreamingHttpResponse
+from django.utils.text import slugify
+from django.views.generic import View
+# from operating.mixins import ObjectViewMixin
+from operating.signals import object_viewed_signal
+from .utils import convert_to_dataframe
+try:
+	from io import BytesIO as IO
+except ImportError:
+	from StringIO import StringIO as IO
+import pandas as pd
+import xlsxwriter
+
+
+BASE_DIR = settings.BASE_DIR
 
 
 
@@ -26,6 +49,10 @@ class HomeView(View):
 
 def options(request):
 	return render(request, "operating/options_page.html", {})
+
+
+def about(request):
+	return render(request, "operating/about.html", {})
 
 
 #@csrf_exempt
@@ -94,6 +121,7 @@ def npmargin_view(request):
 			return render(request, "charts2.html", {})
 	else:
 		form = CompanyNetPercentageForm()
+		
 	return render(request, "operating/form.html",{'form': form})
 
 
@@ -239,17 +267,99 @@ class ChartData_op2(APIView):
 		return Response(data)
 
 
+# def productview(request):
+# 		selected_industry = request.session.get('selected_industry')
+# 		selected_user = request.session.get('selected_user')
+
+# 		# industry_results = npmargin.objects.filter(industry__industry_name=selected_industry)
+# 		# np2015 = (CompanyNetPercentage.objects.filter(user=selected_user)
+# 		# 							 .aggregate(np2015=Sum('netmargin_percentage_2015'))['np2015'])
+		
+# 		qs = CompanyNetPercentage.objects.filter(user=selected_user)
+# 		df = convert_to_dataframe(qs, fields=['gross_profit_margin_2015', 'gross_profit_margin_2016', 'gross_profit_margin_2017',
+# 											'debtequity_ratio_2015', 'debtequity_ratio_2016', 'debtequity_ratio_2017'
+# 											'netmargin_percentage_2015', 'netmargin_percentage_2016', 'netmargin_percentage_2017'])
+
+# 		json = df.to_json(orient='records')
 
 
+# 		context = {
+# 					"data": json
+# 				}
+
+# 		return render (request, 'operating/product.html', context)
+
+def productview(request):
+		selected_industry = request.session.get('selected_industry')
+		selected_user = request.session.get('selected_user')
+
+		# industry_results = npmargin.objects.filter(industry__industry_name=selected_industry)
+		# np2015 = (CompanyNetPercentage.objects.filter(user=selected_user)
+		# 							 .aggregate(np2015=Sum('netmargin_percentage_2015'))['np2015'])
+		
+		qs1 = CompanyNetPercentage.objects.filter(user=selected_user)
+		qs2 = CompanyNetPercentage.objects.filter(industry=selected_industry)
+
+		df1 = convert_to_dataframe(qs1, fields=['user', 'gross_profit_margin_2015', 'gross_profit_margin_2016', 'gross_profit_margin_2017',
+											'debtequity_ratio_2015', 'debtequity_ratio_2016', 'debtequity_ratio_2017',
+											'netmargin_percentage_2015', 'netmargin_percentage_2016', 'netmargin_percentage_2017'])
+		df2 = convert_to_dataframe(qs2, fields=['user', 'gross_profit_margin_2015', 'gross_profit_margin_2016', 'gross_profit_margin_2017',
+											'debtequity_ratio_2015', 'debtequity_ratio_2016', 'debtequity_ratio_2017', 
+											'netmargin_percentage_2015', 'netmargin_percentage_2016', 'netmargin_percentage_2017', 
+											])
+		frames = [df1, df2]
+		result = pd.concat(frames)
+		excel_file = IO()
+		xlwriter = pd.ExcelWriter(excel_file, engine='xlsxwriter')
+
+		result.to_excel(xlwriter, 'sheetname')
+		xlwriter.save()
+		xlwriter.close()
+		excel_file.seek(0)
+
+		response = HttpResponse(excel_file.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+		response['content-Disposition'] = 'attachment; filename=myfile.xlsx'
+		return response
+
+class CSVResponseMixin(object):
+	csv_filename = 'csvfile.csv'
+
+	def get_csv_filename(self):
+		return self.csv_filename
+
+	def render_to_csv(self, context):
+		response = HttpResponse(content_type='text/csv')
+		
+		cd = 'attachment; filename="{0}"'.format(self.get_csv_filename())
+		response['content-Disposition'] = cd
+
+		writer = csv.DictWriter(response, fieldnames=fieldnames	)
+		# writer.writeheader()
+		for row in context:
+			writer.writerow(row)
+
+		return response
+
+class DataView(CSVResponseMixin, View):
+
+	def get(self, request, *args, **kwargs):
+		selected_industry = request.session.get('selected_industry')
+		selected_user = request.session.get('selected_user')
+		qs = CompanyNetPercentage.objects.filter(user=selected_user)
+		df = convert_to_dataframe(qs, fields=['gross_profit_margin_2015', 'gross_profit_margin_2016', 'gross_profit_margin_2017',
+											'debtequity_ratio_2015', 'debtequity_ratio_2016', 'debtequity_ratio_2017'
+											'netmargin_percentage_2015', 'netmargin_percentage_2016', 'netmargin_percentage_2017'])
+
+		json = df.to_json(orient='records')
 
 
+		context = {
+					"data": json
+				}
 
-
-
-
-
-
-
+		
+		return self.render_to_csv(context)
 
 
 
@@ -326,7 +436,16 @@ def signup(request):
 		form = SignUpForm()
 	return render(request, 'operating/signup.html', {'form': form})
 
+def feedback(request):
+	if request.method == 'POST':
+		form = feedbackform(request.POST)
+		if form.is_valid():
+			form.save()
+			return redirect('home')
 
+	else:
+		form = feedbackform(),
+	return render(request, 'operating/feedback.html', {'form': form})
 
 
 def login_page(request):
@@ -351,7 +470,7 @@ def login_page(request):
 		else:
 			print("Error")
 
-	return render(request, "auth/login.html", context)
+	return render(request, "operating/login.html", context)
 
 
 
@@ -366,7 +485,6 @@ def logout_view(request):
 # 	return render(request, "auth/login.html", {})
 	
 
-@login_required
 def trialbalanceanalysis(request):
 	if request.method == "POST":
 		form = trialbalanceForm(request.POST, request.FILES)
@@ -470,15 +588,63 @@ def rationop1(request):
 		"debtequity_ratio_py" : debtequity_ratio_py
 	}
 
+	object_viewed_signal.send(instance.__class__, instance=context, request=request)
 	return render(request, 'operating/rationop1.html', context)
 
 
 
 
 
+def qs_to_local_csv(qs, fields=None, path=None, filename=None):
+	if path is None:
+		path = os.path.join(os.path.dirname(BASE_DIR), 'csvstorage')
+
+		if not os.path.exists(path):
+			os.mkdir(path)
+
+	if filename is None:
+		model_name = slugify(qs.model.__name__)
+		file_name = "{}.csv".format(model_name)
+	filepath = os.path.join(path, filename)
+	lookups = get_lookup_fields(qs.model, fields=fields)
+	dataset = qs_to_dataset(qs, fields)
+	row_done = 0
+	with open(filepath, 'w') as my_file:
+		writer = csv.DictWriter(my_file, filenames=lookups)
+		writer.writeheader()
+		for data_item in dataset:
+			writer.writerow(data_item)
+			rows_done += 1
+	print("{} rows completed".format(rows_done))
 
 
-# 
+class Echo:
+	def write (self, value):
+		return value
+
+class CSVDownloadView(LoginRequiredMixin, View):
+	def get(self, request, *args, **kwargs):
+		qs = ObjectViewed.objects.all()
+		model_name = slugify(qs.model.__name__)
+		filename = "{}.csv".format(model_name)
+		fp = StringIO()
+		pseudo_buffer = Echo()
+		outcsv = csv.writer(pseudo_buffer)
+		writer = csv.DictWriter(my_file, fieldnames=lookups)
+		writer.writeheader()
+		for data_item in dataset:
+			writer.writerow(data_item)
+		stream_file = file(fp)
+		response = StreamingHttpResponse(stream_file,
+										content_type ="text/csv")
+		response['content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+		return response
+
+
+
+# def user(request, user_id):
+# 	user = get_object_or_404(User, pk=user_id)
+# 	return render_to_response('')	
 
 
 
